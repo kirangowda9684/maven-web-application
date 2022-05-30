@@ -39,3 +39,21 @@ steps:
     repository: 'kirangowda9684 / firstrepo'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      [xml]$pomXml = Get-Content .\pom.xml
+      # version
+      Write-Host $pomXml.project.version
+      $version=$pomXml.project.version
+      Write-Host "##vso[task.setvariable variable=version]$version"
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'kirangowda9684 (1)'
+    repositoryName: 'kirangowda9684/maven-web-application'
+    action: 'edit'
+    target: '$(Build.SourceVersion)'
+    tag: '($version)'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
